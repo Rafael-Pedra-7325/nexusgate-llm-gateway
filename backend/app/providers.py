@@ -32,48 +32,33 @@ def _generate_sandbox_answer(prompt: str, model: str, provider: str, complexity_
         )
     if "rate limit" in lower or "distributed" in lower or "architecture" in lower:
         return (
-            f"### Distributed System Design (Generated via `{model}` on `{provider}`)
-
-"
+            f"### Distributed System Design (Generated via `{model}` on `{provider}`)\n\n"
             "1. **Token Bucket in Redis**: Use atomic Lua scripts (`EVAL`) in Redis Cluster to check and decrement "
-            "tokens per tenant key in a single network round-trip.
-"
+            "tokens per tenant key in a single network round-trip.\n"
             "2. **Local L1 Sliding Window**: Maintain an in-memory approximate counter with 100ms sync intervals to "
-            "absorb traffic spikes without saturating Redis.
-"
+            "absorb traffic spikes without saturating Redis.\n"
             "3. **Graceful Degradation**: Return `HTTP 429` with `Retry-After` headers and fail-open policies if "
             "the coordination store experiences transient partitioning."
         )
     if "quicksort" in lower or "code" in lower or "python" in lower or "sql" in lower:
         return (
-            f"Here is an optimized implementation produced by **`{model}`**:
-
-"
-            "```python
-"
-            "def quicksort(arr: list[int]) -> list[int]:
-"
-            "    if len(arr) <= 1:
-"
-            "        return arr
-"
-            "    pivot = arr[len(arr) // 2]
-"
-            "    left = [x for x in arr if x < pivot]
-"
-            "    mid = [x for x in arr if x == pivot]
-"
-            "    right = [x for x in arr if x > pivot]
-"
-            "    return quicksort(left) + mid + quicksort(right)
-"
+            f"Here is an optimized implementation produced by **`{model}`**:\n\n"
+            "```python\n"
+            "def quicksort(arr: list[int]) -> list[int]:\n"
+            "    if len(arr) <= 1:\n"
+            "        return arr\n"
+            "    pivot = arr[len(arr) // 2]\n"
+            "    left = [x for x in arr if x < pivot]\n"
+            "    mid = [x for x in arr if x == pivot]\n"
+            "    right = [x for x in arr if x > pivot]\n"
+            "    return quicksort(left) + mid + quicksort(right)\n"
             "```"
         )
 
     preview = prompt[:90] + ("..." if len(prompt) > 90 else "")
     return (
         f"**[{MODEL_CATALOG[model]['display_name']} • {provider.upper()}]** "
-        f"Processed `{complexity_tier}` tier request for: *"{preview}"*. "
+        f"Processed `{complexity_tier}` tier request for: *\"{preview}\"*. "
         "NexusGate dynamically selected this model to optimize quality-per-dollar and latency SLAs."
     )
 
@@ -153,8 +138,7 @@ async def invoke_model(
                 }
 
         if provider == "anthropic":
-            system_msg = "
-".join(m["content"] for m in messages if m["role"] == "system")
+            system_msg = "\n".join(m["content"] for m in messages if m["role"] == "system")
             user_msgs = [m for m in messages if m["role"] != "system"]
             async with httpx.AsyncClient(timeout=25.0) as client:
                 resp = await client.post(
