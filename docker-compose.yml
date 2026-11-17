@@ -1,0 +1,24 @@
+services:
+  llm-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexusgate-llm-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - SANDBOX_MODE=true
+      - SEED_DEMO_DATA=true
+      - CACHE_ENABLED=true
+      - CACHE_SIMILARITY_THRESHOLD=0.72
+      - DATABASE_PATH=/data/gateway_telemetry.db
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+    volumes:
+      - gateway_data:/data
+    restart: unless-stopped
+
+volumes:
+  gateway_data:
